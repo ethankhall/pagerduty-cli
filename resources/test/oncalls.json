@@ -1,0 +1,508 @@
+{
+    "oncalls": [
+        {
+            "escalation_policy": {
+                "id": "P9OFD2O",
+                "type": "escalation_policy_reference",
+                "summary": "Default",
+                "self": "https://api.pagerduty.com/escalation_policies/P9OFD2O",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P9OFD2O"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PPC00ZX",
+                "type": "user_reference",
+                "summary": "John Doe",
+                "self": "https://api.pagerduty.com/users/PPC00ZX",
+                "html_url": "https://apidocs.pagerduty.com/users/PPC00ZX"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P2EQYW3",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy accusamus eveniet ea",
+                "self": "https://api.pagerduty.com/escalation_policies/P2EQYW3",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P2EQYW3"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PKS2IM6",
+                "type": "user_reference",
+                "summary": "Ola Schoen",
+                "self": "https://api.pagerduty.com/users/PKS2IM6",
+                "html_url": "https://apidocs.pagerduty.com/users/PKS2IM6"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P2EQYW3",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy accusamus eveniet ea",
+                "self": "https://api.pagerduty.com/escalation_policies/P2EQYW3",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P2EQYW3"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "PJ9HDN5",
+                "type": "user_reference",
+                "summary": "Marty Halvorson",
+                "self": "https://api.pagerduty.com/users/PJ9HDN5",
+                "html_url": "https://apidocs.pagerduty.com/users/PJ9HDN5"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PPGU7XT",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy accusantium et eveniet",
+                "self": "https://api.pagerduty.com/escalation_policies/PPGU7XT",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PPGU7XT"
+            },
+            "escalation_level": 2,
+            "schedule": null,
+            "user": {
+                "id": "PLOQ8TO",
+                "type": "user_reference",
+                "summary": "Gregory Bogan",
+                "self": "https://api.pagerduty.com/users/PLOQ8TO",
+                "html_url": "https://apidocs.pagerduty.com/users/PLOQ8TO"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PPGU7XT",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy accusantium et eveniet",
+                "self": "https://api.pagerduty.com/escalation_policies/PPGU7XT",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PPGU7XT"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PTSZOPY",
+                "type": "user_reference",
+                "summary": "Dean Douglas",
+                "self": "https://api.pagerduty.com/users/PTSZOPY",
+                "html_url": "https://apidocs.pagerduty.com/users/PTSZOPY"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P7DBLPX",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy adipisci itaque velit",
+                "self": "https://api.pagerduty.com/escalation_policies/P7DBLPX",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P7DBLPX"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PFBCPQY",
+                "type": "user_reference",
+                "summary": "Noemie Ankunding",
+                "self": "https://api.pagerduty.com/users/PFBCPQY",
+                "html_url": "https://apidocs.pagerduty.com/users/PFBCPQY"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P7DBLPX",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy adipisci itaque velit",
+                "self": "https://api.pagerduty.com/escalation_policies/P7DBLPX",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P7DBLPX"
+            },
+            "escalation_level": 2,
+            "schedule": null,
+            "user": {
+                "id": "P31O4ZX",
+                "type": "user_reference",
+                "summary": "Alexandra Vandervort",
+                "self": "https://api.pagerduty.com/users/P31O4ZX",
+                "html_url": "https://apidocs.pagerduty.com/users/P31O4ZX"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PYIGXD9",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy alias doloribus ut",
+                "self": "https://api.pagerduty.com/escalation_policies/PYIGXD9",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PYIGXD9"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "P7Z7ERB",
+                "type": "user_reference",
+                "summary": "Tavares Boyer",
+                "self": "https://api.pagerduty.com/users/P7Z7ERB",
+                "html_url": "https://apidocs.pagerduty.com/users/P7Z7ERB"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PYIGXD9",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy alias doloribus ut",
+                "self": "https://api.pagerduty.com/escalation_policies/PYIGXD9",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PYIGXD9"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "PUOJAGD",
+                "type": "user_reference",
+                "summary": "Haylie Ankunding",
+                "self": "https://api.pagerduty.com/users/PUOJAGD",
+                "html_url": "https://apidocs.pagerduty.com/users/PUOJAGD"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P61Y5FC",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy alias qui consequatur",
+                "self": "https://api.pagerduty.com/escalation_policies/P61Y5FC",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P61Y5FC"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PNX0Z1M",
+                "type": "user_reference",
+                "summary": "Carolina Bernier",
+                "self": "https://api.pagerduty.com/users/PNX0Z1M",
+                "html_url": "https://apidocs.pagerduty.com/users/PNX0Z1M"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P61Y5FC",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy alias qui consequatur",
+                "self": "https://api.pagerduty.com/escalation_policies/P61Y5FC",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P61Y5FC"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "PIEM3HQ",
+                "type": "user_reference",
+                "summary": "Nickolas Kunze",
+                "self": "https://api.pagerduty.com/users/PIEM3HQ",
+                "html_url": "https://apidocs.pagerduty.com/users/PIEM3HQ"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PT07ISA",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquam atque quo",
+                "self": "https://api.pagerduty.com/escalation_policies/PT07ISA",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PT07ISA"
+            },
+            "escalation_level": 2,
+            "schedule": null,
+            "user": {
+                "id": "PR55MLW",
+                "type": "user_reference",
+                "summary": "Deondre Haley",
+                "self": "https://api.pagerduty.com/users/PR55MLW",
+                "html_url": "https://apidocs.pagerduty.com/users/PR55MLW"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PT07ISA",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquam atque quo",
+                "self": "https://api.pagerduty.com/escalation_policies/PT07ISA",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PT07ISA"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PP3AUFQ",
+                "type": "user_reference",
+                "summary": "Vallie Funk",
+                "self": "https://api.pagerduty.com/users/PP3AUFQ",
+                "html_url": "https://apidocs.pagerduty.com/users/PP3AUFQ"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "P4FJ3C9",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquam dicta hic",
+                "self": "https://api.pagerduty.com/escalation_policies/P4FJ3C9",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/P4FJ3C9"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "PH8P83M",
+                "type": "user_reference",
+                "summary": "Diego Marvin",
+                "self": "https://api.pagerduty.com/users/PH8P83M",
+                "html_url": "https://apidocs.pagerduty.com/users/PH8P83M"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PLNQVXD",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquid deleniti voluptas",
+                "self": "https://api.pagerduty.com/escalation_policies/PLNQVXD",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PLNQVXD"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PVM0SLW",
+                "type": "user_reference",
+                "summary": "Cristobal Block",
+                "self": "https://api.pagerduty.com/users/PVM0SLW",
+                "html_url": "https://apidocs.pagerduty.com/users/PVM0SLW"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PLNQVXD",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquid deleniti voluptas",
+                "self": "https://api.pagerduty.com/escalation_policies/PLNQVXD",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PLNQVXD"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PHD7HWE",
+                "type": "user_reference",
+                "summary": "Constantin Cassin",
+                "self": "https://api.pagerduty.com/users/PHD7HWE",
+                "html_url": "https://apidocs.pagerduty.com/users/PHD7HWE"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PLNQVXD",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy aliquid deleniti voluptas",
+                "self": "https://api.pagerduty.com/escalation_policies/PLNQVXD",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PLNQVXD"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PG342RL",
+                "type": "user_reference",
+                "summary": "Yazmin Grant",
+                "self": "https://api.pagerduty.com/users/PG342RL",
+                "html_url": "https://apidocs.pagerduty.com/users/PG342RL"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PCCJEHC",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy amet maiores doloribus",
+                "self": "https://api.pagerduty.com/escalation_policies/PCCJEHC",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PCCJEHC"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "PQUGTCN",
+                "type": "user_reference",
+                "summary": "Melyssa Bartoletti",
+                "self": "https://api.pagerduty.com/users/PQUGTCN",
+                "html_url": "https://apidocs.pagerduty.com/users/PQUGTCN"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PGFKF71",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy architecto qui porro",
+                "self": "https://api.pagerduty.com/escalation_policies/PGFKF71",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PGFKF71"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PRUXCXH",
+                "type": "user_reference",
+                "summary": "Domingo Abshire",
+                "self": "https://api.pagerduty.com/users/PRUXCXH",
+                "html_url": "https://apidocs.pagerduty.com/users/PRUXCXH"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PGFKF71",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy architecto qui porro",
+                "self": "https://api.pagerduty.com/escalation_policies/PGFKF71",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PGFKF71"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PV2D3UR",
+                "type": "user_reference",
+                "summary": "Rosanna Dach",
+                "self": "https://api.pagerduty.com/users/PV2D3UR",
+                "html_url": "https://apidocs.pagerduty.com/users/PV2D3UR"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PGFKF71",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy architecto qui porro",
+                "self": "https://api.pagerduty.com/escalation_policies/PGFKF71",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PGFKF71"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PT17YO8",
+                "type": "user_reference",
+                "summary": "Brooks Pouros",
+                "self": "https://api.pagerduty.com/users/PT17YO8",
+                "html_url": "https://apidocs.pagerduty.com/users/PT17YO8"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PTJV7JF",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy at omnis soluta",
+                "self": "https://api.pagerduty.com/escalation_policies/PTJV7JF",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PTJV7JF"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PYJGNYH",
+                "type": "user_reference",
+                "summary": "Juston Kilback",
+                "self": "https://api.pagerduty.com/users/PYJGNYH",
+                "html_url": "https://apidocs.pagerduty.com/users/PYJGNYH"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PTJV7JF",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy at omnis soluta",
+                "self": "https://api.pagerduty.com/escalation_policies/PTJV7JF",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PTJV7JF"
+            },
+            "escalation_level": 1,
+            "schedule": null,
+            "user": {
+                "id": "PKGUZ0W",
+                "type": "user_reference",
+                "summary": "Frederic King",
+                "self": "https://api.pagerduty.com/users/PKGUZ0W",
+                "html_url": "https://apidocs.pagerduty.com/users/PKGUZ0W"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PSAG5GP",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy atque aut deserunt",
+                "self": "https://api.pagerduty.com/escalation_policies/PSAG5GP",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PSAG5GP"
+            },
+            "escalation_level": 3,
+            "schedule": null,
+            "user": {
+                "id": "P77G1QO",
+                "type": "user_reference",
+                "summary": "Jamel Leuschke",
+                "self": "https://api.pagerduty.com/users/P77G1QO",
+                "html_url": "https://apidocs.pagerduty.com/users/P77G1QO"
+            },
+            "start": null,
+            "end": null
+        },
+        {
+            "escalation_policy": {
+                "id": "PSAG5GP",
+                "type": "escalation_policy_reference",
+                "summary": "Escalation Policy atque aut deserunt",
+                "self": "https://api.pagerduty.com/escalation_policies/PSAG5GP",
+                "html_url": "https://apidocs.pagerduty.com/escalation_policies/PSAG5GP"
+            },
+            "escalation_level": 2,
+            "schedule": null,
+            "user": {
+                "id": "P2ZJRY7",
+                "type": "user_reference",
+                "summary": "Tina Mann",
+                "self": "https://api.pagerduty.com/users/P2ZJRY7",
+                "html_url": "https://apidocs.pagerduty.com/users/P2ZJRY7"
+            },
+            "start": null,
+            "end": null
+        }
+    ],
+    "limit": 25,
+    "offset": 0,
+    "more": true,
+    "total": null
+}
