@@ -7,13 +7,13 @@ mod api;
 
 use api::*;
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct PagerDutyUserGroups {
     pub users: Vec<PagerDutyUser>,
     pub depth: u8,
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub struct EscalationPolicy {
     pub id: String,
     pub description: Option<String>,

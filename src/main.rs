@@ -23,7 +23,7 @@ async fn main() -> Result<(), &'static str> {
         (@setting SubcommandRequiredElseHelp)
         (@setting ColorAuto)
         (@setting VersionlessSubcommands)
-        (@arg API_TOKEN: -a --("api-token") +global +takes_value env("API_TOKEN") "A PagerDuty API Token to valid for READ access")
+        (@arg API_TOKEN: -a --("api-token") +global +takes_value env("PAGERDUTY_TOKEN") "A PagerDuty API Token to valid for READ access")
         (@group logging =>
             (@arg debug: -v --verbose +global +multiple "Increasing verbosity")
             (@arg warn: -w --warn +global "Only display warning messages")
@@ -88,7 +88,8 @@ async fn export_escilation_policies(client: v2::PagerDutyClient, args: &ArgMatch
 }
 
 async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
-    let policies = client.fetch_policies_for_account().await;
+    let mut policies = client.fetch_policies_for_account().await;
+    policies.sort();
 
     let tree = output::tree::TreePrinter::default();
     let filter = args.value_of("filter");
@@ -96,7 +97,7 @@ async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
     for policy in policies {
 
         if let Some(filter) = filter {
-            if !policy.policy_name.to_lowercase().contains(filter) {
+            if !policy.policy_name.to_lowercase().contains(&filter.to_lowercase()) {
                 continue;
             }
         }
