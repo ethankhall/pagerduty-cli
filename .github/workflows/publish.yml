@@ -40,7 +40,8 @@ jobs:
         command: check
     - uses: actions-rs/cargo@v1
       with:
-        command: build --release
+        command: build
+        args: --release
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1
       with:
@@ -80,7 +81,8 @@ jobs:
         command: check
     - uses: actions-rs/cargo@v1
       with:
-        command: build --release
+        command: build
+        args: --release
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1
       with:
