@@ -110,5 +110,7 @@ jobs:
           chmod +x ~/bin/crom
           ~/bin/crom tag-version --source local,github --ignore-changes
           ~/bin/crom upload-artifacts --root-artifact-path=./artifacts linux mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       
