@@ -98,11 +98,11 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: mac-artifacts
-          path: artifacts/mac/pagerduty-cli
+          path: artifacts/mac
       - uses: actions/download-artifact@v1
         with:
           name: linux-artifacts
-          path: artifacts/linux/pagerduty-cli
+          path: artifacts/linux
       - name: Create release
         run: |
           mkdir ~/bin
