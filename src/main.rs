@@ -17,6 +17,13 @@ lazy_static! {
 async fn main() -> Result<(), &'static str> {
     dotenv().ok();
 
+    let is_number = |arg: String| {
+        match arg.parse::<u8>() {
+            Ok(_) => Ok(()),
+            Err(_) => Err(format!("`{}` is not a number (0-255)", arg))
+        }
+    };
+
     let matches = clap_app!(("pagerduty-cli") =>
         (version: crate_version!())
         (about: "PagerDuty CLI")
@@ -32,13 +39,15 @@ async fn main() -> Result<(), &'static str> {
         (@subcommand who =>
             (name: "who-is-oncall")
             (alias: "who")
+            (alias: "oncall")
             (about: "List who is Oncall")
             (@arg filter: --filter +takes_value "Only show Escalation Policies that contain the string.")
-            (@arg format: -f --format +takes_value possible_value[tree json csv] "Format the Escalation oncalls should be exported.")
+            (@arg format: -f --format +takes_value default_value("tree") possible_value[tree json csv] "Format the Escalation oncalls should be exported.")
+            (@arg depth: --depth +takes_value {is_number} "How far down the Escalation Policy should be printed?")
         )
         (@subcommand export =>
             (name: "export")
-            (about: "Export escilation policy to disk")
+            (about: "Export escalation policy to disk")
             (@arg dest: -o --output +takes_value default_value("-") "Where to save the output. Use `-` for stdout.")
             (@arg format: -f --filter +takes_value possible_value[tfstate] "Only show Escalation Policies that contain the string.")
         )
@@ -94,6 +103,7 @@ async fn export_escilation_policies(client: v2::PagerDutyClient, args: &ArgMatch
 
 async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
     let filter = args.value_of("filter");
+    let max_depth = args.value_of("depth").map(|s| s.parse::<u8>().unwrap()).unwrap_or(255);
 
     let mut policies = Vec::new();
     for policy in client.fetch_policies_for_account().await {
@@ -111,10 +121,17 @@ async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
     }
     policies.sort();
 
+    let usergroup_filter = |usergroup: &crate::v2::PagerDutyUserGroups| {
+        if usergroup.depth > max_depth {
+            return false;
+        }
+        return true
+    };
+
     let output = match args.value_of("format").unwrap() {
-        "tree" => output::build_tree_output(policies, |_| true),
-        "json" => output::build_json_output(policies, |_| true),
-        "csv" => output::build_csv_output(policies, |_| true),
+        "tree" => output::build_tree_output(policies, usergroup_filter),
+        "json" => output::build_json_output(policies, usergroup_filter),
+        "csv" => output::build_csv_output(policies, usergroup_filter),
         _ => unreachable!(),
     };
 

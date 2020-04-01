@@ -82,7 +82,7 @@ where
                     group
                         .users
                         .iter()
-                        .map(|user| user.name.clone())
+                        .map(|user| user.to_display())
                         .collect::<Vec<String>>()
                         .join(", ")
                 ));
