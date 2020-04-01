@@ -70,6 +70,12 @@ pub struct PagerDutyUser {
     pub email: String,
 }
 
+impl PagerDutyUser {
+    pub fn to_display(&self) -> String {
+        format!("{} ({})", self.name, self.email)
+    }
+}
+
 pub struct PagerDutyClient {
     api: PagerDutyApi,
 }

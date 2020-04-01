@@ -1,6 +1,6 @@
 [package]
 name = "pagerduty-cli"
-version = "0.1.0"
+version = "9.99.999-SNAPSHOT"
 authors = ["Ethan Hall <ethan@hall.sh>"]
 edition = "2018"
 
