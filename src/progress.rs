@@ -5,8 +5,8 @@ pub struct ProgressBarHelper {
 }
 
 pub enum ProgressBarType<'a> {
-    #[allow(dead_code)]
     SizedProgressBar(usize, &'a str),
+    #[allow(dead_code)]
     UnsizedProgressBar(&'a str),
 }
 
@@ -37,6 +37,10 @@ impl ProgressBarHelper {
             pb.enable_steady_tick(100);
             ProgressBarHelper { pb }
         }
+    }
+
+    pub fn inc_length(&self) {
+        self.pb.inc_length(1);
     }
 
     #[allow(dead_code)]

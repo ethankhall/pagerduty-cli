@@ -1,13 +1,13 @@
-use std::sync::Mutex;
 use lazy_static::lazy_static;
+use std::sync::Mutex;
 
 use clap::{clap_app, crate_version, ArgMatches};
 use dotenv::dotenv;
 use flexi_logger::{LevelFilter, LogSpecBuilder, Logger};
 
+mod output;
 mod progress;
 mod v2;
-mod output;
 
 lazy_static! {
     static ref DEBUG_LEVEL: Mutex<i32> = Mutex::new(0);
@@ -33,13 +33,14 @@ async fn main() -> Result<(), &'static str> {
             (name: "who-is-oncall")
             (alias: "who")
             (about: "List who is Oncall")
-            (@arg filter: -f --filter +takes_value "Only show Escilation Policies that contain the string")
+            (@arg filter: --filter +takes_value "Only show Escalation Policies that contain the string.")
+            (@arg format: -f --format +takes_value possible_value[tree json csv] "Format the Escalation oncalls should be exported.")
         )
         (@subcommand export =>
             (name: "export")
             (about: "Export escilation policy to disk")
             (@arg dest: -o --output +takes_value default_value("-") "Where to save the output. Use `-` for stdout.")
-            (@arg format: -f --filter +takes_value possible_value[tfstate] "Only show Escilation Policies that contain the string")
+            (@arg format: -f --filter +takes_value possible_value[tfstate] "Only show Escalation Policies that contain the string.")
         )
     ).get_matches();
 
@@ -66,8 +67,12 @@ async fn main() -> Result<(), &'static str> {
     let pagerduty_client = v2::PagerDutyClient::new(matches.value_of("API_TOKEN").unwrap());
 
     match matches.subcommand() {
-        ("who-is-oncall", Some(arg_matches)) => { who_is_oncall(pagerduty_client, &arg_matches).await; }
-        ("export", Some(arg_matches)) => { export_escilation_policies(pagerduty_client, &arg_matches).await; }
+        ("who-is-oncall", Some(arg_matches)) => {
+            who_is_oncall(pagerduty_client, &arg_matches).await;
+        }
+        ("export", Some(arg_matches)) => {
+            export_escilation_policies(pagerduty_client, &arg_matches).await;
+        }
         _ => unreachable!(),
     };
 
@@ -76,7 +81,7 @@ async fn main() -> Result<(), &'static str> {
 
 async fn export_escilation_policies(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
     let policies = client.fetch_policies_for_account().await;
-    let mut tf_state = output::export::TfStateExportData::default();
+    let mut tf_state = output::tfstate::TfStateExportData::default();
 
     for policy in policies {
         tf_state.add_escalation_policy(policy);
@@ -88,27 +93,32 @@ async fn export_escilation_policies(client: v2::PagerDutyClient, args: &ArgMatch
 }
 
 async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
-    let mut policies = client.fetch_policies_for_account().await;
-    policies.sort();
-
-    let tree = output::tree::TreePrinter::default();
     let filter = args.value_of("filter");
 
-    for policy in policies {
-
+    let mut policies = Vec::new();
+    for policy in client.fetch_policies_for_account().await {
         if let Some(filter) = filter {
-            if !policy.policy_name.to_lowercase().contains(&filter.to_lowercase()) {
+            if !policy
+                .policy_name
+                .to_lowercase()
+                .contains(&filter.to_lowercase())
+            {
                 continue;
             }
         }
-        let root = tree.add_line(format!("Escilation Policy - {}", policy.policy_name));
-        let oncalls = root.add_line("Oncalls".into());
-        for group in policy.oncall_groups {
-            oncalls.add_line(format!("Level {} - {}", group.depth, group.users.iter().map(|user| user.name.clone()).collect::<Vec<String>>().join(", ")));
-        }
-    }
 
-    tree.print();
+        policies.push(policy);
+    }
+    policies.sort();
+
+    let output = match args.value_of("format").unwrap() {
+        "tree" => output::build_tree_output(policies, |_| true),
+        "json" => output::build_json_output(policies, |_| true),
+        "csv" => output::build_csv_output(policies, |_| true),
+        _ => unreachable!(),
+    };
+
+    println!("{}", output);
 }
 
 fn custom_log_format(
