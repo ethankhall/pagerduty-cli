@@ -1,8 +1,8 @@
+use crate::progress::{ProgressBarHelper, ProgressBarType};
 use log::{error, info, warn};
 use reqwest::Client;
 use serde::Deserialize;
 use std::collections::BTreeMap;
-use crate::progress::{ProgressBarHelper, ProgressBarType};
 
 const PAGE_SIZE: u32 = 100;
 
@@ -36,7 +36,6 @@ pub struct ModelReference {
 }
 
 pub(crate) struct PagerDutyApi {
-    client: Client,
     auth_token: String,
 }
 
@@ -68,134 +67,117 @@ pub enum PagerDutyObjects {
     Services(Vec<ServiceModel>),
 }
 
-struct PagerDutyState {
-    users: BTreeMap<String, UserModel>,
-    services: BTreeMap<String, ServiceModel>,
-    escalation_policies: BTreeMap<String, EscalationPolicyModel>,
-    oncalls: Vec<OnCallModel>,
-}
+fn make_escalation_policies(
+    source_escalation_policies: Vec<EscalationPolicyModel>,
+    source_users: Vec<UserModel>,
+    source_oncalls: Vec<OnCallModel>,
+    source_services: Vec<ServiceModel>,
+) -> Vec<super::EscalationPolicy> {
+    let mut return_policies = Vec::new();
 
-impl Default for PagerDutyState {
-    fn default() -> Self {
-        PagerDutyState {
-            users: BTreeMap::default(),
-            services: BTreeMap::default(),
-            escalation_policies: BTreeMap::default(),
-            oncalls: Vec::default(),
-        }
+    let mut users_map = BTreeMap::new();
+    for user in source_users {
+        users_map.insert(user.id.clone(), user);
     }
-}
 
-impl PagerDutyState {
-    fn make_escalation_policies(&self) -> Vec<super::EscalationPolicy> {
-        let mut return_policies = Vec::new();
+    for esc_model in source_escalation_policies {
+        let mut users = Vec::new();
+        let mut services = Vec::new();
 
-        for esc_model in self.escalation_policies.values() {
-            let mut users = Vec::new();
-            let mut services = Vec::new();
+        let esc_id = esc_model.id.clone();
+        let mut oncall_for_esc = Vec::new();
 
-            let esc_id = esc_model.id.clone();
-            let mut oncall_for_esc = Vec::new();
-
-            for oncall in self.oncalls.iter() {
-                if oncall.escalation_policy.id == esc_id {
-                    oncall_for_esc.push(oncall.clone());
-                }
+        for oncall in source_oncalls.iter() {
+            if oncall.escalation_policy.id == esc_id {
+                oncall_for_esc.push(oncall.clone());
             }
+        }
 
-            let max_depth = oncall_for_esc
-                .iter()
-                .map(|x| x.escalation_level)
-                .max()
-                .unwrap_or(1);
+        let max_depth = oncall_for_esc
+            .iter()
+            .map(|x| x.escalation_level)
+            .max()
+            .unwrap_or(1);
 
-            for depth in 1..=max_depth {
-                let mut users_for_depth = Vec::new();
-                for oncall in oncall_for_esc.iter() {
-                    if oncall.escalation_level == depth {
-                        if let Some(user) = self.users.get(&oncall.user.id) {
-                            users_for_depth.push(super::PagerDutyUser {
-                                id: user.id.clone(),
-                                name: user.name.clone(),
-                                email: user.email.clone(),
-                            });
-                        }
+        for depth in 1..=max_depth {
+            let mut users_for_depth = Vec::new();
+            for oncall in oncall_for_esc.iter() {
+                if oncall.escalation_level == depth {
+                    if let Some(user) = users_map.get(&oncall.user.id) {
+                        users_for_depth.push(super::PagerDutyUser {
+                            id: user.id.clone(),
+                            name: user.name.clone(),
+                            email: user.email.clone(),
+                        });
                     }
                 }
-
-                users.push(super::PagerDutyUserGroups {
-                    users: users_for_depth,
-                    depth,
-                });
             }
 
-            for service in self.services.values() {
-                if service.escalation_policy.id == esc_id {
-                    services.push(service.name.clone());
-                }
-            }
-
-            return_policies.push(super::EscalationPolicy {
-                id: esc_id,
-                description: esc_model.description.clone(),
-                policy_name: esc_model.name.clone(),
-                oncall_groups: users,
-                services,
+            users.push(super::PagerDutyUserGroups {
+                users: users_for_depth,
+                depth,
             });
         }
 
-        return_policies
+        for service in &source_services {
+            if service.escalation_policy.id == esc_id {
+                services.push(service.name.clone());
+            }
+        }
+
+        return_policies.push(super::EscalationPolicy {
+            id: esc_id,
+            description: esc_model.description.clone(),
+            policy_name: esc_model.name.clone(),
+            oncall_groups: users,
+            services,
+        });
     }
 
-    fn add_policy(&mut self, policy: EscalationPolicyModel) {
-        self.escalation_policies.insert(policy.id.clone(), policy);
-    }
-
-    fn add_oncall(&mut self, oncall: OnCallModel) {
-        self.oncalls.push(oncall);
-    }
-
-    fn add_user(&mut self, user: UserModel) {
-        self.users.insert(user.id.clone(), user);
-    }
-
-    fn add_service(&mut self, service: ServiceModel) {
-        self.services.insert(service.id.clone(), service);
-    }
+    return_policies
 }
 
 impl PagerDutyApi {
     pub(crate) fn new(auth_token: String) -> Self {
-        let client = reqwest::Client::builder()
-            .timeout(std::time::Duration::from_secs(30))
-            .build()
-            .expect("Should be able to make client");
-
-        PagerDutyApi { client, auth_token }
+        PagerDutyApi { auth_token }
     }
 
     pub(crate) async fn get_escalation_policies(&self) -> Vec<super::EscalationPolicy> {
-        let mut state = PagerDutyState::default();
+        let pb = ProgressBarHelper::new(ProgressBarType::SizedProgressBar(
+            0,
+            "{prefix:.bold.dim} {spinner:.green} {pos:>2}/{len:>2} Fetching data from PagerDuty",
+        ));
 
-        self.fetch_policies_for_account(&mut state).await;
-        self.fetch_oncalls_for_account(&mut state).await;
-        self.fetch_users_for_account(&mut state).await;
-        self.fetch_services_for_account(&mut state).await;
+        let api_resolver = ApiResolver::new(&self.auth_token, &pb);
 
-        state.make_escalation_policies()
+        let (policies, oncalls, users, services) = tokio::join!(
+            self.fetch_policies_for_account(&api_resolver),
+            self.fetch_oncalls_for_account(&api_resolver),
+            self.fetch_users_for_account(&api_resolver),
+            self.fetch_services_for_account(&api_resolver)
+        );
+
+        pb.done();
+
+        make_escalation_policies(policies, users, oncalls, services)
     }
 
-    async fn fetch_services_for_account(&self, state: &mut PagerDutyState) {
-        let some_response = self
-            .make_api_call("Services", "https://api.pagerduty.com/services", &[])
+    async fn fetch_services_for_account(
+        &self,
+        api_resolver: &ApiResolver<'_>,
+    ) -> Vec<ServiceModel> {
+        let some_response = api_resolver
+            .make_api_call("https://api.pagerduty.com/services", &[])
             .await;
+
+        let mut outputs: Vec<ServiceModel> = Vec::new();
 
         match some_response {
             Some(objs) => {
                 for obj in objs {
                     if let PagerDutyObjects::Services(services) = obj {
                         for service in services {
-                            state.add_service(service);
+                            outputs.push(service);
                         }
                     }
                 }
@@ -204,19 +186,22 @@ impl PagerDutyApi {
                 warn!("Unable to get policies. Skipping.");
             }
         }
+        outputs
     }
 
-    async fn fetch_users_for_account(&self, state: &mut PagerDutyState) {
-        let some_response = self
-            .make_api_call("Users", "https://api.pagerduty.com/users", &[])
+    async fn fetch_users_for_account(&self, api_resolver: &ApiResolver<'_>) -> Vec<UserModel> {
+        let some_response = api_resolver
+            .make_api_call("https://api.pagerduty.com/users", &[])
             .await;
+
+        let mut outputs: Vec<UserModel> = Vec::new();
 
         match some_response {
             Some(objs) => {
                 for obj in objs {
                     if let PagerDutyObjects::Users(users) = obj {
                         for user in users {
-                            state.add_user(user);
+                            outputs.push(user);
                         }
                     }
                 }
@@ -225,19 +210,22 @@ impl PagerDutyApi {
                 warn!("Unable to get policies. Skipping.");
             }
         }
+        outputs
     }
 
-    async fn fetch_oncalls_for_account(&self, state: &mut PagerDutyState) {
-        let some_response = self
-            .make_api_call("Oncalls", "https://api.pagerduty.com/oncalls", &["targets"])
+    async fn fetch_oncalls_for_account(&self, api_resolver: &ApiResolver<'_>) -> Vec<OnCallModel> {
+        let some_response = api_resolver
+            .make_api_call("https://api.pagerduty.com/oncalls", &["targets"])
             .await;
+
+        let mut outputs: Vec<OnCallModel> = Vec::new();
 
         match some_response {
             Some(objs) => {
                 for obj in objs {
                     if let PagerDutyObjects::Oncalls(oncalls) = obj {
                         for oncall in oncalls {
-                            state.add_oncall(oncall);
+                            outputs.push(oncall);
                         }
                     }
                 }
@@ -246,23 +234,28 @@ impl PagerDutyApi {
                 warn!("Unable to get policies. Skipping.");
             }
         }
+        outputs
     }
 
-    async fn fetch_policies_for_account(&self, state: &mut PagerDutyState) {
-        let some_response = self
+    async fn fetch_policies_for_account(
+        &self,
+        api_resolver: &ApiResolver<'_>,
+    ) -> Vec<EscalationPolicyModel> {
+        let some_response = api_resolver
             .make_api_call(
-                "Escalation Policies",
                 "https://api.pagerduty.com/escalation_policies",
                 &["targets"],
             )
             .await;
+
+        let mut outputs: Vec<EscalationPolicyModel> = Vec::new();
 
         match some_response {
             Some(objs) => {
                 for obj in objs {
                     if let PagerDutyObjects::EscalationPolicies(policies) = obj {
                         for policy in policies {
-                            state.add_policy(policy);
+                            outputs.push(policy);
                         }
                     }
                 }
@@ -271,16 +264,37 @@ impl PagerDutyApi {
                 warn!("Unable to get policies. Skipping.");
             }
         }
+
+        outputs
+    }
+}
+
+struct ApiResolver<'a> {
+    pb: &'a ProgressBarHelper,
+    client: Client,
+    auth_token: &'a str,
+}
+
+impl<'a> ApiResolver<'a> {
+    pub(crate) fn new(auth_token: &'a str, pb: &'a ProgressBarHelper) -> Self {
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .expect("Should be able to make client");
+
+        ApiResolver {
+            pb,
+            client,
+            auth_token,
+        }
     }
 
-    async fn make_api_call(&self, name: &str, url: &str, includes: &[&str]) -> Option<Vec<PagerDutyObjects>> {
+    async fn make_api_call(&self, url: &str, includes: &[&str]) -> Option<Vec<PagerDutyObjects>> {
         let mut poll_queue: Vec<u32> = vec![0];
         let mut response_array = Vec::new();
 
-        let pb = ProgressBarHelper::new(ProgressBarType::UnsizedProgressBar("{prefix:.bold.dim} {spinner:.green} {pos:>2} {wide_msg}"));
-        pb.inc_with_message(&format!("Pages of {}", name));
-
         while !poll_queue.is_empty() {
+            self.pb.inc_length();
             let offset = poll_queue.pop().unwrap();
 
             let resp = self
@@ -324,14 +338,10 @@ impl PagerDutyApi {
             response_array.push(resp.obj);
 
             if resp.more {
-                pb.inc();
                 poll_queue.push(offset + PAGE_SIZE);
             }
+            self.pb.inc();
         }
-
-        pb.done();
-
-        print!("{}\r", termion::clear::CurrentLine);
 
         Some(response_array)
     }

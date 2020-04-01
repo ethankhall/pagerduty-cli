@@ -9,11 +9,13 @@ struct Line {
 }
 
 impl Line {
-    fn print(&self, prefix: &str, is_last: bool, graph: &Graph) {
+    fn print(&self, prefix: &str, is_last: bool, graph: &Graph) -> String {
+        let mut output_buffer = String::default();
+
         if is_last {
-            println!("{} └─ {}", prefix, self.content);
+            output_buffer += &format!("{} └─ {}\n", prefix, self.content);
         } else {
-            println!("{} ├─ {}", prefix, self.content)
+            output_buffer += &format!("{} ├─ {}\n", prefix, self.content);
         }
 
         let child_prefix = if is_last {
@@ -27,13 +29,15 @@ impl Line {
         let size = edges.len();
         for (idx, node) in edges.iter().enumerate() {
             let line = graph.get_line(*node);
-            line.print(&child_prefix, idx == size - 1, &graph);
+            output_buffer += &line.print(&child_prefix, idx == size - 1, &graph);
         }
+
+        output_buffer
     }
 }
 
 #[derive(Debug)]
-struct Graph { 
+struct Graph {
     nodes: RwLock<BTreeMap<usize, Rc<Line>>>,
     edges: RwLock<BTreeMap<usize, Vec<usize>>>,
     index_counter: RwLock<usize>,
@@ -45,14 +49,22 @@ impl Graph {
             *self.index_counter.write().unwrap() += 1;
         }
         let id = *self.index_counter.read().unwrap();
-        let line = Line { id, content: message };
+        let line = Line {
+            id,
+            content: message,
+        };
         self.nodes.write().unwrap().insert(id, Rc::new(line));
         self.edges.write().unwrap().insert(id, Vec::new());
         id
     }
 
     fn connect_edges(&self, parent: usize, child: usize) {
-        self.edges.write().unwrap().entry(parent).or_default().push(child);
+        self.edges
+            .write()
+            .unwrap()
+            .entry(parent)
+            .or_default()
+            .push(child);
     }
 
     fn get_line(&self, id: usize) -> Rc<Line> {
@@ -62,21 +74,28 @@ impl Graph {
 
 impl std::default::Default for Graph {
     fn default() -> Self {
-        Graph { nodes: Default::default(), edges: Default::default(), index_counter: Default::default() }
+        Graph {
+            nodes: Default::default(),
+            edges: Default::default(),
+            index_counter: Default::default(),
+        }
     }
 }
 
 pub struct OutputLine {
     graph: Rc<Graph>,
-    id: usize
+    id: usize,
 }
 
 impl OutputLine {
-    pub fn add_line(&self, message: String) -> OutputLine{
+    pub fn add_line(&self, message: String) -> OutputLine {
         let child_id = self.graph.add_line(message);
         self.graph.connect_edges(self.id, child_id);
 
-        OutputLine { graph: self.graph.clone(), id: child_id }
+        OutputLine {
+            graph: self.graph.clone(),
+            id: child_id,
+        }
     }
 }
 
@@ -87,7 +106,10 @@ pub struct TreePrinter {
 
 impl std::default::Default for TreePrinter {
     fn default() -> Self {
-        TreePrinter { graph: Default::default(), roots: Default::default() }
+        TreePrinter {
+            graph: Default::default(),
+            roots: Default::default(),
+        }
     }
 }
 
@@ -98,15 +120,21 @@ impl TreePrinter {
             self.roots.write().unwrap().push(id);
         }
 
-        OutputLine { graph: self.graph.clone(), id }
+        OutputLine {
+            graph: self.graph.clone(),
+            id,
+        }
     }
 
-    pub fn print(&self) {
+    pub fn to_string(&self) -> String {
         let size = self.roots.read().unwrap().len();
+        let mut buffer = String::default();
 
         for (idx, root) in self.roots.read().unwrap().iter().enumerate() {
             let line = self.graph.get_line(*root);
-            line.print("", idx == size - 1, &self.graph);
+            buffer += &line.print("", idx == size - 1, &self.graph);
         }
+
+        buffer
     }
 }
