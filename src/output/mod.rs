@@ -90,7 +90,7 @@ where
         }
     }
 
-    tree.to_string()
+    tree.render()
 }
 
 pub fn write_file(path: &str, contents: &str) -> std::io::Result<()> {

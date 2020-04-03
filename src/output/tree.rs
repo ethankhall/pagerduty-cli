@@ -126,7 +126,7 @@ impl TreePrinter {
         }
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn render(&self) -> String {
         let size = self.roots.read().unwrap().len();
         let mut buffer = String::default();
 

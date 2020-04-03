@@ -33,7 +33,7 @@ impl ProgressBarHelper {
                 .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ ")
                 .progress_chars("#>-")
                 .template(&template);
-            pb.set_style(spinner_style.clone());
+            pb.set_style(spinner_style);
             pb.enable_steady_tick(100);
             ProgressBarHelper { pb }
         }

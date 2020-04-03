@@ -4,10 +4,13 @@ use std::sync::Mutex;
 use clap::{clap_app, crate_version, ArgMatches};
 use dotenv::dotenv;
 use flexi_logger::{LevelFilter, LogSpecBuilder, Logger};
+use regex::Regex;
 
 mod output;
 mod progress;
 mod v2;
+
+use crate::v2::EscalationPolicy;
 
 lazy_static! {
     static ref DEBUG_LEVEL: Mutex<i32> = Mutex::new(0);
@@ -17,11 +20,9 @@ lazy_static! {
 async fn main() -> Result<(), &'static str> {
     dotenv().ok();
 
-    let is_number = |arg: String| {
-        match arg.parse::<u8>() {
-            Ok(_) => Ok(()),
-            Err(_) => Err(format!("`{}` is not a number (0-255)", arg))
-        }
+    let is_number = |arg: String| match arg.parse::<u8>() {
+        Ok(_) => Ok(()),
+        Err(_) => Err(format!("`{}` is not a number (0-255)", arg)),
     };
 
     let matches = clap_app!(("pagerduty-cli") =>
@@ -41,7 +42,8 @@ async fn main() -> Result<(), &'static str> {
             (alias: "who")
             (alias: "oncall")
             (about: "List who is Oncall")
-            (@arg filter: --filter +takes_value "Only show Escalation Policies that contain the string.")
+            (@arg include: -i --include +takes_value +multiple "Regex that when matches will include the policy. Regex syntax: https://docs.rs/regex/1.3.6/regex/#syntax")
+            (@arg exclude: -x --exclude +takes_value +multiple "Regex that when matches will exclude the policy. Include takes precedence.  Regex syntax: https://docs.rs/regex/1.3.6/regex/#syntax")
             (@arg format: -f --format +takes_value default_value("tree") possible_value[tree json csv] "Format the Escalation oncalls should be exported.")
             (@arg depth: --depth +takes_value {is_number} "How far down the Escalation Policy should be printed?")
         )
@@ -102,22 +104,28 @@ async fn export_escilation_policies(client: v2::PagerDutyClient, args: &ArgMatch
 }
 
 async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
-    let filter = args.value_of("filter");
-    let max_depth = args.value_of("depth").map(|s| s.parse::<u8>().unwrap()).unwrap_or(255);
+    let include_vec: Vec<Regex> = args
+        .values_of("include")
+        .unwrap_or_default()
+        .map(|i| Regex::new(i).unwrap_or_else(|_| panic!("`{}` to be valid regex", i)))
+        .collect();
+
+    let exclude_vec: Vec<Regex> = args
+        .values_of("exclude")
+        .unwrap_or_default()
+        .map(|i| Regex::new(i).unwrap_or_else(|_| panic!("`{}` to be valid regex", i)))
+        .collect();
+
+    let max_depth = args
+        .value_of("depth")
+        .map(|s| s.parse::<u8>().unwrap())
+        .unwrap_or(255);
 
     let mut policies = Vec::new();
     for policy in client.fetch_policies_for_account().await {
-        if let Some(filter) = filter {
-            if !policy
-                .policy_name
-                .to_lowercase()
-                .contains(&filter.to_lowercase())
-            {
-                continue;
-            }
+        if policy_should_be_included(&include_vec, &exclude_vec, &policy) {
+            policies.push(policy);
         }
-
-        policies.push(policy);
     }
     policies.sort();
 
@@ -125,7 +133,7 @@ async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
         if usergroup.depth > max_depth {
             return false;
         }
-        return true
+        true
     };
 
     let output = match args.value_of("format").unwrap() {
@@ -136,6 +144,43 @@ async fn who_is_oncall(client: v2::PagerDutyClient, args: &ArgMatches<'_>) {
     };
 
     println!("{}", output);
+}
+
+enum PolicyMatch {
+    Yes,
+    No,
+    NotProvided,
+}
+
+fn policy_should_be_included(
+    includes_vec: &[Regex],
+    excludes_vec: &[Regex],
+    policy: &EscalationPolicy,
+) -> bool {
+    match does_policy_match(includes_vec, &policy) {
+        PolicyMatch::Yes => return true,
+        PolicyMatch::No => return false,
+        PolicyMatch::NotProvided => {}
+    };
+
+    match does_policy_match(excludes_vec, &policy) {
+        PolicyMatch::Yes => false,
+        PolicyMatch::No => true,
+        PolicyMatch::NotProvided => true,
+    }
+}
+
+fn does_policy_match(inputs: &[Regex], policy: &EscalationPolicy) -> PolicyMatch {
+    if !inputs.is_empty() {
+        for exp in inputs {
+            if exp.is_match(&policy.policy_name) {
+                return PolicyMatch::Yes;
+            }
+        }
+        return PolicyMatch::No;
+    }
+
+    PolicyMatch::NotProvided
 }
 
 fn custom_log_format(
