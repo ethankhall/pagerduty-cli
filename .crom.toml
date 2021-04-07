@@ -3,11 +3,11 @@ types = ["Cargo"]
 message-template = "Releasing {version}."
 
 [artifact.mac]
-paths = {inc = "mac/pagerduty-cli"}
-compress = { name = "inc-mac.tar.gz", format = "tgz" }
+paths = {"pagerduty-cli" = "mac/pagerduty-cli"}
+compress = { name = "pagerduty-cli-mac.tar.gz", format = "tgz" }
 target = "GitHub"
 
 [artifact.linux]
-paths = {inc = "linux/pagerduty-cli"}
-compress = { name = "inc-linux-x86_64.tar.gz", format = "tgz" }
+paths = {"pagerduty-cli" = "linux/pagerduty-cli"}
+compress = { name = "pagerduty-cli-linux-x86_64.tar.gz", format = "tgz" }
 target = "GitHub"
